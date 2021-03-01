@@ -1,0 +1,330 @@
+---
+title: "Homework 2"
+author: "Hyeonjin Lee"
+date: "2/27/2021"
+output: pdf_document
+---
+Introduction to Statistical Learning in R Homework 2 (Chapter 3):  
+------------------------------------------------------
+
+
+### Question 4
+> I collect a set of data (n = 100 observations) containing a single
+predictor and a quantitative response. I then fit a linear regression
+model to the data, as well as a separate cubic regression
+
+a)
+> Suppose that the true relationship between X and Y is linear. Consider the training residual sum of
+squares (RSS) for the linear regression, and also the training
+RSS for the cubic regression. Would we expect one to be lower
+than the other, would we expect them to be the same, or is there
+not enough information to tell? Justify your answer.
+
+> There isn't complete concrete information to fully determine which training RSS is lower betwee linear and cubic. However, because the true relationship is determined to be linear, we would expect the least squares line to be similar to the true regression line and thus the RSS for the linear regression may be lower than the cubic.
+
+b)
+> Answer (a) using test rather than training RSS.  
+
+> There isn't enough information as the test RSS depends on the test data. However, the cubic regression will have a higher test RSS due to the overfitting that which may have more error than the linear regression.
+  
+  
+c)
+>  Suppose that the true relationship between X and Y is not linear,
+but we don’t know how far it is from linear. Consider the training
+RSS for the linear regression, and also the training RSS for the
+cubic regression. Would we expect one to be lower than the
+other, would we expect them to be the same, or is there not
+enough information to tell? Justify your answer.  
+  
+> Cubic regression will have a lower train RSS because of the higher flexibility. Therefore, it will fllow the points of the training model more closely and lower the train RSS.
+
+d)
+> Answer (c) using test rather than training RSS.  
+  
+> When referring to the test RSS, there is not enough information to conclude which test RSS will be lower. The claim is also that we don't know how far it is from linear. If it was closer to the linear than cubic, the test RSS for linear will be smaller and vice versa.
+
+### Question 10  
+>  This question should be answered using the Carseats data set.  
+
+a)
+> Fit a multiple regression model to predict Sales using Price,
+Urban, and US.  
+
+```{r}
+library(ISLR)
+data(Carseats)
+fit1 <- lm(Sales ~ Price + Urban + US, data = Carseats)
+summary(fit1)
+```
+
+b)
+> Provide an interpretation of each coefficient in the model. Be
+careful—some of the variables in the model are qualitative  
+
+> Because sales is in units in thousands, we can multiply the coefficients by 1000 to get one unit in sales.  
+
+> On average, for every dollar increase in Price, we can expect a 54.46 unit decrease in sales considering all other predictors are fixed. 
+
+> On average, the unit sales in Urban locations are 21.916 units less than rural locations.  
+
+> On average, the unit sales in the US locations are 1200.57 units greater than non-US locations.  
+
+
+c)
+> Write out the model in equation form, being careful to handle
+the qualitative variables properly.  
+
+> Sales=13.0434689 + (-0.0544588)Price + (-0.0219162)Urban + (1.2005727)US + $\epsilon$  
+> Urban = 1 if the store is in an Urban location and 0 otherwise  
+> US = 1 if the store is in a US location and 0 otherwise
+
+d)
+> For which of the predictors can you reject the null hypothesis $H_{0}: \beta_{j} = 0$? 
+
+> We can see that the p-value of Price and US variables are extremely small and smaller than our alpha of .05. Therefore, we can reject the null hypothesis for those variables.  
+
+e)
+>  On the basis of your response to the previous question, fit a
+smaller model that only uses the predictors for which there is
+evidence of association with the outcome.  
+
+```{r}
+fit2 <- lm(Sales ~ Price + US, data = Carseats)
+summary(fit2)
+```
+
+f)
+> How well do the models in (a) and (e) fit the data?  
+
+> In both models, the R-squared value is .2393. This shows that only 23.93% of the variability is explained by the model. The R-squared for the smaller model is very similar if not slightly better than the bigger model in part a.
+
+g)
+> Using the model from (e), obtain 95 % confidence intervals for
+the coefficient(s).  
+
+```{r}
+confint(fit2)
+```
+
+h)
+> Is there evidence of outliers or high leverage observations in the
+model from (e)?  
+
+```{r}
+par(mfrow=c(2,2))
+plot(fit2)
+```
+> Looking at the plot of residuals vs leverage, we can see evidence of a few outliers as some values are higher than 2 and lower than -2. There is also evidence of some leverage points as points exeed (p + 1 )/ n(.01).
+
+
+### Question 13  
+> In this exercise you will create some simulated data and will fit simple
+linear regression models to it. Make sure to use set.seed(1) prior to
+starting part (a) to ensure consistent results.  
+
+a)
+> Using the rnorm() function, create a vector, x, containing 100
+observations drawn from a N(0, 1) distribution. This represents
+a feature, X.
+
+```{r}
+set.seed(1)
+x <- rnorm(100)
+```
+
+b)
+> Using the rnorm() function, create a vector, eps, containing 100
+observations drawn from a N(0, 0.25) distribution i.e. a normal
+distribution with mean zero and variance 0.25.
+
+```{r}
+eps <- rnorm(100, sd = sqrt(.25))
+```
+
+c)
+> Using x and eps, generate a vector y according to the model
+  Y = -1+0.5X + $\epsilon$  
+What is the length of the vector y? What are the values of $\beta 0$
+and $\beta 1$ in this linear model?
+
+```{r}
+y <- -1 + .5 * x + eps
+length(y)
+```
+> values of $\beta 0$ and $\beta 1$ are -1 and .5  
+  
+d)
+> Create a scatterplot displaying the relationship between x and y. Comment on what you observe.  
+
+```{r}
+plot(x,y)
+```
+> For the most part, x and y look to have a linear relationship with some variance from the eps.  
+
+
+e)
+> Fit a least squares linear model to predict y using x. Comment
+on the model obtained. How do $\hat{\beta 0}$ and $\hat{\beta 1}$ compare to $\beta 0$ and $\beta 1$?
+
+```{r}
+fit3 <- lm(y ~ x)
+summary(fit3)
+```
+> The model has a p-value that is extremely small and smaller than our alpha of .05 therefore we can reject the null hypothesis. In addition, $\hat{\beta 0}$ and $\hat{\beta 1}$ are -1.01885 and .49947 respectively. This is very close to the $\beta 0$ and $\beta 1$ values of -1 and .5.  
+
+
+f)
+> Display the least squares line on the scatterplot obtained in (d).
+Draw the population regression line on the plot, in a different
+color. Use the legend() command to create an appropriate legend.
+
+```{r}
+plot(x,y)
+abline(fit3, col="red")
+abline(-1,.5, col="green")
+legend("topleft", c("Least Square", "Regression"), col = c("red", "green"),lty=c(1,1))
+```
+
+g)
+>  Now fit a polynomial regression model that predicts y using x
+and x2. Is there evidence that the quadratic term improves the
+model fit? Explain your answer.
+
+```{r}
+fit4 <- lm(y ~ x + I(x^2))
+summary(fit4)
+```
+> Although there was an increase in the R-squared value and a decrease in the RSE, we can note that (x^2) term is not significant. The p-value is greater than .05 and thus there is not enough evidence to suggest that the new model improves the model fit.  
+
+
+h)
+> Repeat (a)–(f) after modifying the data generation process in
+such a way that there is less noise in the data. The model (3.39)
+should remain the same. You can do this by decreasing the variance of the normal distribution used to generate the error term $\epsilon$ in (b). Describe your results.
+
+```{r}
+set.seed(1)
+eps <- rnorm(100, sd= .1)
+x <- rnorm(100)
+y <- -1 + .5*x + eps
+plot(x,y)
+fit5 <- lm(y ~ x)
+summary(fit5)
+
+abline(fit5, col="red")
+abline(-1,.5, col="green")
+legend("topleft", c("Least Square", "Regression"),col = c("red", "green"), lty=c(1,1))
+```
+> By decreasing the variance of the normal distribution of the error term, the values follow a more strictly linear pattern. This has led to a decrease in RSE and an increase in R^2. The two lines also overlap each other as the slope and intercept are nearly the same.  
+
+ 
+i)
+> Repeat (a)–(f) after modifying the data generation process in
+such a way that there is more noise in the data. The model
+(3.39) should remain the same. You can do this by increasing
+the variance of the normal distribution used to generate the
+error term  in (b). Describe your results.  
+
+```{r}
+set.seed(1)
+eps <- rnorm(100, sd=.75)
+x <- rnorm(100)
+y <- -1 + .5 * x + eps
+plot(x,y)
+
+fit6 <- lm(y~x)
+summary(fit6)
+
+abline(fit6, col="red")
+abline(-1,.5, col="green")
+legend("topleft", c("Least Square", "Regression"), col=c("red", "green"), lty=c(1,1))
+```
+> We increased the variance of the error term drastically. We can see that the linear relationship has become weaker and thus a lower R^2 and a higher RSE. In addition, the lines do not overlap as close as the other models but they are still fairly similar as seen by the intercept and slope values. 
+
+j)
+> What are the confidence intervals for $\beta 0$ and $\beta 1$ based on the
+original data set, the noisier data set, and the less noisy data
+set? Comment on your results
+
+```{r}
+# Original Data
+confint(fit3)
+
+#Less Noisy Data
+confint(fit5)
+
+# Noisier Data
+confint(fit6)
+```
+> We can note that as the noise increased, the confidence interval became wider while as the noise decreased, the confidence interval became narrower. In addition, all intervals seem to be centered around .5 which is appropriate.  
+
+### Question 14 (a-f)  
+> This problem focuses on the collinearity problem
+
+a)
+> Perform the following commands in R:
+
+```{r}
+set.seed(1)
+x1=runif(100)
+x2=0.5*x1+rnorm(100)/10
+y=2+2*x1+0.3*x2+rnorm(100)
+```
+
+> The last line corresponds to creating a linear model in which y is a function of x1 and x2. Write out the form of the linear model.
+What are the regression coefficients? 
+
+> Y = 2 + 2 X1 + .3X2 + $\epsilon$
+> The regression coefficients are 2, 2, and .3 respectively.  
+
+b)
+> What is the correlation between x1 and x2? Create a scatterplot
+displaying the relationship between the variables.
+
+```{r}
+cor(x1,x2)
+plot(x1,x2)
+```
+
+c)
+>  Using this data, fit a least squares regression to predict y using
+x1 and x2. Describe the results obtained. 
+What are $\hat{\beta 0}$, $\hat{\beta 1}$, and $\hat{\beta 2}$?
+
+>How do these relate to the true $\beta 0$, $\beta 1$, and $\beta 2$? 
+
+>Can you reject the null hypothesis $H_{0} : \beta 1 = 0$ ? How about the null hypothesis $H_{0} : \beta 2 = 0$?
+
+```{r}
+fit7 <- lm(y ~ x1 + x2)
+summary(fit7)
+```
+> $\hat{\beta 0}$, $\hat{\beta 1}$, and $\hat{\beta 2}$ are 2.13, 1.4396, and 1.0097. Only $\hat{\beta 0}$ is close to $\beta 0$ of 2. We also can see that the p-value of x2 is greater than .05 and thus cannot reject the null hypothesis for $\beta 2$ We can reject the null hypothesis on $\beta 1$ as the p-value is less than .05 and thus significant.  
+
+d)
+> Now fit a least squares regression to predict y using only x1.
+Comment on your results. Can you reject the null hypothesis
+$H_{0} : \beta 1 = 0$  
+
+```{r}
+fit8 <- lm(y ~ x1)
+summary(fit8)
+```
+> We can reject the null hypothesis $H_{0} : \beta 1 = 0$ as the p-value is extremely small and smaller than our alpha of .05. We can also note that the coefficient for x1 is much higher in the newer model than the previous.  
+
+e)
+> Now fit a least squares regression to predict y using only x2.
+Comment on your results. Can you reject the null hypothesis
+$H_{0} : \beta 1 = 0$
+
+```{r}
+fit9 <- lm(y ~ x2)
+summary(fit9)
+```
+> $H_{0} : \beta 1 = 0$ can be rejected as the p-value is extremely small and smaller than our alpha of .05 and thus significant. We can also see that the coefficient for x2 is much higher in this new model.  
+
+f)
+>  Do the results obtained in (c)–(e) contradict each other? Explain
+your answer.
+
+> There seems to be evidence of collinearity between the predictors x1 and x2. We can see when comparing the individual models that the significance of the x2 variable is hidden due to the collinearity between the variables. We can also see that the standard error for $\hat{\beta 1}$ is greater with the model that includes both x1 and x2 and we should note that the collinearity reduces the accuracy of the estimates of the regression coefficients.  
